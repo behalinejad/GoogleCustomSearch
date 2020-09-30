@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:life_bonder_entrance_test/src/blocs/search_bloc.dart';
 import 'package:life_bonder_entrance_test/src/custom_widgets/search_button.dart';
+import 'package:life_bonder_entrance_test/src/models/search_response.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -8,7 +10,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchText = TextEditingController();
+   bool isSearching ;
 
+  @override
+  void initState() {
+   isSearching = false;
+    super.initState();
+  }
   @override
   void dispose() {
     _searchText.dispose();
@@ -65,7 +73,16 @@ class _HomePageState extends State<HomePage> {
                       width: 10,
                     ),
                     CustomButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (_searchText.text != null)
+                          if (_searchText.text.trim().length > 0){
+                           // Search button has pushed  and the StreamBuilder for listView are going to be called
+                            setState(() {
+                              isSearching = true;
+                            });
+
+                          }
+                      },
                       icon: Icons.search,
                     ),
                     SizedBox(
@@ -75,9 +92,23 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            !isSearching ? Container() : StreamBuilder(
+               stream: SearchBloc.getSearchResult(_searchText.text) ,
+                builder: (context,snapshot){
+                 if(snapshot.hasData && snapshot.data!=null){
+                    return Container();
+                 }else if(snapshot.hasError) {
+                   return Container();
+                 }else {
+                   return Container();
+                 }
+                }
+            ),
           ],
         ),
       )),
     );
   }
+
+
 }
