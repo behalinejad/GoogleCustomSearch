@@ -5,6 +5,7 @@ import 'package:life_bonder_entrance_test/src/custom_widgets/search_button.dart'
 import 'package:life_bonder_entrance_test/src/custom_widgets/searched_item_list_tile.dart';
 import 'package:life_bonder_entrance_test/src/models/search_response.dart';
 
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -13,6 +14,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchText = TextEditingController();
   bool isSearching;
+  List<SearchResponse> _currentSearchResponseList = List<SearchResponse>();
+  int _currentSearchResponseRow = 1;
 
   @override
   void initState() {
@@ -76,13 +79,20 @@ class _HomePageState extends State<HomePage> {
                   ),
                   CustomButton(
                     onPressed: () {
-                      if (_searchText.text !=
-                          null) if (_searchText.text.trim().length > 0) {
+                      // Search button has pushed  and the StreamBuilder for listView are going to be called
+                      _currentSearchResponseList.clear();
+                      _currentSearchResponseRow = 1; // reset controller for  search page and pagination
+                      isSearching = true;
+                      setState(() {
+
+                      });
+                      /*if (_searchText.text != null) if (_searchText.text.trim().length > 0) {
                         // Search button has pushed  and the StreamBuilder for listView are going to be called
+
                         setState(() {
-                          isSearching = true;
+
                         });
-                      }
+                      }*/
                     },
                     icon: Icons.search,
                   ),
@@ -93,28 +103,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          !isSearching
-              ? Container()
-              : StreamBuilder(
-                  stream: SearchBloc.getSearchResult(_searchText.text),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData && snapshot.data != null) {
-                      isSearching = false;
-                      return _buildListView(snapshot.data);
-                    } else if (snapshot.hasError) {
-                      isSearching = false;
-                      return Center(
-                        child: Text('Ohh . I\'m sorry . No result found '),
-                      );
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          backgroundColor: Colors.lightBlue,
-                          strokeWidth: 5,
-                        ),
-                      );
-                    }
-                  }),
+          !isSearching ? Container() : _streamBuilder(),
         ],
       )),
     );
@@ -122,13 +111,28 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildListView(List<SearchResponse> searchResponseList) {
     try {
-      return Expanded(
-        child: ListView.builder(
-          itemCount: searchResponseList.length,
-          itemBuilder: (context, index) {
-            return SearchedItemListTile(
-                searchResponse: searchResponseList[index]);
-          },
+      return NotificationListener<ScrollNotification>(
+        onNotification: (scrollInfo) {
+          if (!isSearching && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            // start loading data again
+
+            _currentSearchResponseRow += 10;
+            setState(() {
+              isSearching = true;
+            });
+
+            _streamBuilder();
+          }
+          return true;
+        },
+        child: Expanded(
+          child: ListView.builder(
+            itemCount: searchResponseList.length,
+            itemBuilder: (context, index) {
+              return SearchedItemListTile(
+                  searchResponse: searchResponseList[index]);
+            },
+          ),
         ),
       );
     } on Exception catch (e) {
@@ -139,4 +143,35 @@ class _HomePageState extends State<HomePage> {
       ).show(context);
     }
   }
+
+  Widget _streamBuilder() {
+    return StreamBuilder(
+        stream: SearchBloc.getSearchResult(
+            _searchText.text, _currentSearchResponseRow),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            isSearching = false;
+            if (snapshot.connectionState == ConnectionState.done) { // Check The Stream tunnel for unwanted data
+              _currentSearchResponseList.addAll(snapshot.data);
+            }
+              return _buildListView(_currentSearchResponseList);
+
+
+          } else if (snapshot.hasError) {
+            isSearching = false;
+            return Center(
+              child: Text('Ohh . I\'m sorry . No result found '),
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlue,
+                strokeWidth: 5,
+              ),
+            );
+          }
+        });
+  }
+
+
 }
