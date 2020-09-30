@@ -9,11 +9,16 @@ class SearchedItemListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: Icon(Icons.arrow_forward_ios),
-        title: Text(searchResponse.title.toString()),
-      ),
-    );
+    try {
+      return Card(
+        child: ListTile(
+          leading: Icon(Icons.arrow_forward_ios),
+          title: Text(searchResponse.title.toString()),
+          subtitle: Text(searchResponse.link.toString()),
+        ),
+      );
+    } on Exception catch (e) {
+      rethrow;
+    }
   }
 }
