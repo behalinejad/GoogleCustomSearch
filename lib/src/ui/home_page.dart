@@ -5,7 +5,6 @@ import 'package:life_bonder_entrance_test/src/custom_widgets/search_button.dart'
 import 'package:life_bonder_entrance_test/src/custom_widgets/searched_item_list_tile.dart';
 import 'package:life_bonder_entrance_test/src/models/search_response.dart';
 
-
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -13,7 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchText = TextEditingController();
-  bool isSearching;
+  bool isSearching; // the controller for searching process
   List<SearchResponse> _currentSearchResponseList = List<SearchResponse>();
   int _currentSearchResponseRow = 1;
 
@@ -42,7 +41,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           Padding(
             padding:
-                const EdgeInsets.only(bottom: 30, right: 20, left: 20, top: 30),
+                const EdgeInsets.only(bottom: 10, right: 20, left: 20, top: 30),
             child: Container(
               decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
@@ -81,18 +80,11 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () {
                       // Search button has pushed  and the StreamBuilder for listView are going to be called
                       _currentSearchResponseList.clear();
-                      _currentSearchResponseRow = 1; // reset controller for  search page and pagination
+                      _currentSearchResponseRow =
+                          1; // reset controller for  search page and pagination
                       isSearching = true;
-                      setState(() {
+                      setState(() {});
 
-                      });
-                      /*if (_searchText.text != null) if (_searchText.text.trim().length > 0) {
-                        // Search button has pushed  and the StreamBuilder for listView are going to be called
-
-                        setState(() {
-
-                        });
-                      }*/
                     },
                     icon: Icons.search,
                   ),
@@ -103,6 +95,13 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+
+           _currentSearchResponseList.length >0 ? Text( 'Search Results Counts : ${_currentSearchResponseList.length} '  ,style: TextStyle(fontWeight: FontWeight.w700,color: Colors.indigo) ,) : Container(),
+          // The Text is used to Show record Counts while Pagination happens
+          Padding(
+             padding: const EdgeInsets.only(bottom: 8),
+             child: Divider(thickness: 2,),
+           ),
           !isSearching ? Container() : _streamBuilder(),
         ],
       )),
@@ -113,14 +112,14 @@ class _HomePageState extends State<HomePage> {
     try {
       return NotificationListener<ScrollNotification>(
         onNotification: (scrollInfo) {
-          if (!isSearching && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+          if (!isSearching &&
+              scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
             // start loading data again
 
             _currentSearchResponseRow += 10;
             setState(() {
               isSearching = true;
             });
-
             _streamBuilder();
           }
           return true;
@@ -138,40 +137,69 @@ class _HomePageState extends State<HomePage> {
     } on Exception catch (e) {
       PlatformAlertDialog(
         title: 'error in search',
-        content: 'oops . Somthing went Wrong',
+        content: 'oops . Something went Wrong',
         defaultActionText: ' Ok ',
       ).show(context);
+      return Text('You need to try again');
     }
   }
 
   Widget _streamBuilder() {
-    return StreamBuilder(
-        stream: SearchBloc.getSearchResult(
-            _searchText.text, _currentSearchResponseRow),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            isSearching = false;
-            if (snapshot.connectionState == ConnectionState.done) { // Check The Stream tunnel for unwanted data
-              _currentSearchResponseList.addAll(snapshot.data);
+    try {
+      return StreamBuilder(
+          stream: SearchBloc.getSearchResult(
+              _searchText.text, _currentSearchResponseRow),
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              isSearching = false;
+              if (snapshot.connectionState == ConnectionState.done) {
+                // Check The Stream tunnel for unwanted data
+                _currentSearchResponseList.addAll(snapshot.data);
+              }
+
+              if (snapshot.data.isNotEmpty ) {
+                return _buildListView(_currentSearchResponseList);
+              }else {
+                if (snapshot.data.isEmpty && _currentSearchResponseList.length > 0)
+                return _buildListView(_currentSearchResponseList);
+                else {
+                  return Center(
+                    child: Text('Ohh . I\'m sorry . No result found '),
+                  );
+                }
+              }
+            } else if (snapshot.hasError) {
+              isSearching = false;
+              // Check if search not found or response items reached to its end ;
+              return _currentSearchResponseRow < 2
+                  ? Center(
+                      child: Text('Ohh . I\'m sorry . No result found '),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                        itemCount: _currentSearchResponseList.length,
+                        itemBuilder: (context, index) {
+                          return SearchedItemListTile(
+                              searchResponse:
+                                  _currentSearchResponseList[index]);
+                        },
+                      ),
+                    );
+            } else {
+              return Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.lightBlue,
+                  strokeWidth: 5,
+                ),
+              );
             }
-              return _buildListView(_currentSearchResponseList);
-
-
-          } else if (snapshot.hasError) {
-            isSearching = false;
-            return Center(
-              child: Text('Ohh . I\'m sorry . No result found '),
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.lightBlue,
-                strokeWidth: 5,
-              ),
-            );
-          }
-        });
+          });
+    } on Exception catch (e) {
+      PlatformAlertDialog(
+        title: 'error in search',
+        content: 'oops . Something went Wrong',
+        defaultActionText: ' Ok ',
+      ).show(context);
+    }
   }
-
-
 }

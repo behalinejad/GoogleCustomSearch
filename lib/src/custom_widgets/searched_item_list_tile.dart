@@ -20,7 +20,7 @@ class SearchedItemListTile extends StatelessWidget {
             text: TextSpan(
               children:
               [
-
+               // to access the Website of the each search results .
                 TextSpan(
                   text: searchResponse.link,
                   style:  TextStyle(color: Colors.blue,fontSize: 12),
