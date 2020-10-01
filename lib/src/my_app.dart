@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       //Moving to Home Page which is Google Custom Search Service
-      home: HomePage(),
+      home: HomePage.create(context),
     );
   }
 }

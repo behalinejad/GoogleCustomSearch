@@ -6,7 +6,7 @@ import 'package:life_bonder_entrance_test/src/models/search_response.dart';
 
 class Http {
   final googleApiUrl = 'https://www.googleapis.com/customsearch/v1';
-  final key = 'AIzaSyBMVZs-2rn_fYS-PRLuhnewDUVvC6keKx0'; //The Key for Google Custom Search request
+  final key = 'AIzaSyDpfWK3bL0Qkfbo7MY5iXoAyzW_ESGfRjU'; //The Key for Google Custom Search request
   final cx = 'e543eb235b9fc8963';//The cx for Google Custom Search request
   final headers = {'Content-Type': 'application/json'};
 
