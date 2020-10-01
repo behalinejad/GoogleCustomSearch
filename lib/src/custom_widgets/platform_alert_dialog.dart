@@ -35,7 +35,7 @@ class PlatformAlertDialog extends PlatformWidget {
   }
 
   @override
-  Widget buildCupertinoWidget(BuildContext context) {
+  Widget buildCupertinoWidget(BuildContext context) {// Ios Platforom dialog
     return CupertinoAlertDialog(
       title: Text(
         title,
@@ -51,7 +51,7 @@ class PlatformAlertDialog extends PlatformWidget {
   }
 
   @override
-  Widget buildMaterialWidget(BuildContext context) {
+  Widget buildMaterialWidget(BuildContext context) { //  android Platform Dialog
     return AlertDialog(
         title: Text(
           title,

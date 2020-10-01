@@ -12,25 +12,30 @@ class SearchedItemListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     try {
-      return Card(
-        child: ListTile(
-          leading: Icon(Icons.arrow_forward_ios),
-          title: Text(searchResponse.title.toString(),style: TextStyle(fontWeight: FontWeight.w700),),
-          subtitle:RichText(
-            text: TextSpan(
-              children:
-              [
-               // to access the Website of the each search results .
-                TextSpan(
-                  text: searchResponse.link,
-                  style:  TextStyle(color: Colors.blue,fontSize: 12),
-                  recognizer:  TapGestureRecognizer()
-                    ..onTap = () { _launchURL(searchResponse.link);
-                    },
-                ),
-              ],
-            ),
-          ), //Text(searchResponse.link.toString()),
+      return Padding(
+        padding: const EdgeInsets.only(right: 10,left: 10),
+        child: Card(
+          elevation: 3,
+          color: Colors.blueGrey[50],
+          child: ListTile(
+            leading: Icon(Icons.arrow_forward_ios),
+            title: Text(searchResponse.title.toString(),style: TextStyle(fontWeight: FontWeight.w700),),
+            subtitle:RichText(
+              text: TextSpan(
+                children:
+                [
+                 // to access the Website of the each search results .
+                  TextSpan(
+                    text: searchResponse.link,
+                    style:  TextStyle(color: Colors.blue,fontSize: 12),
+                    recognizer:  TapGestureRecognizer()
+                      ..onTap = () { _launchURL(searchResponse.link);
+                      },
+                  ),
+                ],
+              ),
+            ), //Text(searchResponse.link.toString()),
+          ),
         ),
       );
     } on Exception catch (e) {

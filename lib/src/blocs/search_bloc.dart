@@ -3,7 +3,7 @@ import 'package:life_bonder_entrance_test/src/models/search_response.dart';
 import 'package:life_bonder_entrance_test/src/services/http.dart';
 
 class SearchBloc {
-
+ // StreamController of Type bool for IsSearch variable in HomePage
   final StreamController<bool> _isSearchingController =StreamController<bool>();
   Stream<bool> get isSearchingStream => _isSearchingController.stream;
 

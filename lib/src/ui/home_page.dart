@@ -7,6 +7,7 @@ import 'package:life_bonder_entrance_test/src/models/search_response.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
+  // This Create Method is to ensure that HomePage should always be run under SearchBloc Provider package
   static Widget create(BuildContext context) {
     return Provider<SearchBloc>(
       builder: (_) => SearchBloc(),
@@ -45,13 +46,13 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Google custom search'),
+        title: Text('Google Custom Search'),
       ),
       body: StreamBuilder(
         stream: bloc.isSearchingStream,
         initialData: false,
         builder: (context, snapshot) {
-          return _buildHomeBody(context);
+          return _buildHomeBody(context); //Body of the Scaffold for State Management using Bloc
         },
       ),
     );
@@ -67,9 +68,6 @@ class _HomePageState extends State<HomePage> {
             // start loading data again
 
             _currentSearchResponseRow += 10;
-            /*setState(() {
-              isSearching = true;
-            });*/
             isSearching = true;
             bloc.setIsSearching(isSearching);
             _streamBuilder();
@@ -108,7 +106,7 @@ class _HomePageState extends State<HomePage> {
       );
     } on Exception catch (e) {
       PlatformAlertDialog(
-        title: 'error in search',
+        title: 'Error in search',
         content: 'oops . Something went Wrong',
         defaultActionText: ' Ok ',
       ).show(context);
@@ -172,7 +170,7 @@ class _HomePageState extends State<HomePage> {
           });
     } on Exception catch (e) {
       PlatformAlertDialog(
-        title: 'error in search',
+        title: 'Error in search',
         content: 'oops . Something went Wrong',
         defaultActionText: ' Ok ',
       ).show(context);
@@ -240,8 +238,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-
-
         !isSearching ? Container() : _streamBuilder(),
       ],
     ));
