@@ -1,6 +1,6 @@
-# Google_Custom_Search
+# google_custom_search
 
-This is flutter App for Googl eCustom Search test.
+This is flutter App for Google Custom Search test.
 
 ## Getting Started
 
