@@ -1,6 +1,6 @@
-# life_bonder_entrance_test
+# Google_Custom_Search
 
-This is flutter App for Life Bonder entrance test.
+This is flutter App for Googl eCustom Search test.
 
 ## Getting Started
 
